@@ -11,6 +11,7 @@ import { AdminPanel } from './components/AdminPanel';
 import { SplashScreen } from './components/SplashScreen';
 import { OfficialResults } from './components/OfficialResults';
 import { UserProfile } from './components/UserProfile';
+import { InstallPWA } from './components/InstallPWA';
 import { FileText, CheckCircle2, Sun, Moon, LayoutGrid, PenLine, LogOut, Settings, Bell, X, User as UserIcon, CheckCheck, Loader2, Trophy, Clock, RefreshCw, MessageCircle, Users } from 'lucide-react';
 import { supabase } from './lib/supabaseClient';
 
@@ -280,7 +281,11 @@ export const App: React.FC = () => {
           const mergedMatches: Match[] = activeMatches.map((m: any) => {
               const matchBets: Record<string, { scoreA: number, scoreB: number }> = {};
               
-              validBets.filter((b: any) => b.match_id === m.id).forEach((b: any) => {
+              // CRITICAL FIX: Ensure ID comparison handles string/int mismatch
+              // Supabase might return number, Local state uses string
+              const matchIdStr = m.id.toString();
+
+              validBets.filter((b: any) => b.match_id.toString() === matchIdStr).forEach((b: any) => {
                   const username = userIdMap[b.user_id];
                   if (username) {
                       matchBets[username] = {
@@ -361,14 +366,26 @@ export const App: React.FC = () => {
     const changedKey = Object.keys(newBets).find(key => newBets[key as keyof ExtraBet] !== extraBets[key as keyof ExtraBet]);
     if (changedKey) {
         const { data: { user: authUser } } = await supabase.auth.getUser();
-        if (authUser) {
+        if (authUser && user) {
              const value = newBets[changedKey as keyof ExtraBet];
-             const { error } = await supabase.from('extra_bets').upsert({
+             const payload: any = {
                  user_id: authUser.id,
+                 username: user.username, 
                  slug: changedKey,
                  value: value
-             }, { onConflict: 'user_id, slug' });
-             if (error) console.error("Error saving extra bet:", error);
+             };
+
+             const { error } = await supabase.from('extra_bets').upsert(payload, { onConflict: 'user_id, slug' });
+             
+             if (error) {
+                 if (error.code === '42703' && error.message.includes('username')) {
+                     // Retry without username column
+                     delete payload.username;
+                     await supabase.from('extra_bets').upsert(payload, { onConflict: 'user_id, slug' });
+                 } else {
+                     console.error("Error saving extra bet:", error);
+                 }
+             }
         }
     }
   };
@@ -654,7 +671,8 @@ export const App: React.FC = () => {
       )}
 
       {/* HEADER */}
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-200 dark:border-slate-800 px-4 py-3 shadow-sm">
+      {/* Removido o backdrop-blur e background semi-transparente para evitar problemas de rolagem */}
+      <header className="sticky top-0 z-50 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 px-4 py-3 shadow-sm">
         <div className="max-w-5xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-3">
              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-yellow-500 rounded-lg p-0.5 shadow-md hidden sm:block">
@@ -833,6 +851,9 @@ export const App: React.FC = () => {
         )}
 
       </main>
+
+      {/* INSTALL PWA PROMPT */}
+      <InstallPWA />
 
       {/* BOTTOM NAVIGATION (Mobile) */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 p-2 z-40 md:hidden">

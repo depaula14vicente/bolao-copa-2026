@@ -1,7 +1,27 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { APP_LOGO_URL } from '../constants';
 
 export const SplashScreen: React.FC = () => {
+  useEffect(() => {
+    // Tenta tocar um som curto de "apito" ao iniciar
+    const audio = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU..."); // Placeholder curto
+    // Exemplo real de som curto (pop) em base64 para evitar erros de arquivo externo
+    const popSound = "data:audio/mp3;base64,SUQzBAAAAAABAFRYWFgAAAASAAADbWFqb3JfYnJhbmQAbXA0MgBUWFhYAAAAEQAAA21pbm9yX3ZlcnNpb24AMABUWFhYAAAAHAAAA2NvbXBhdGlibGVfYnJhbmRzAGlzb21tcDQyAFRTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//uQZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWgAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABYaW5nAAAAEAAAAAEAAABwAADUAA=="; 
+    
+    // Tentativa segura de reprodução
+    const playSound = async () => {
+        try {
+            const a = new Audio(popSound);
+            a.volume = 0.5;
+            await a.play();
+        } catch (e) {
+            // Autoplay bloqueado pelo navegador é esperado
+        }
+    };
+    
+    playSound();
+  }, []);
+
   return (
     <div className="fixed inset-0 z-[100] bg-slate-900 flex flex-col items-center justify-center overflow-hidden">
       {/* Background Effects */}
@@ -34,7 +54,7 @@ export const SplashScreen: React.FC = () => {
            <div className="h-full bg-gradient-to-r from-green-500 to-yellow-500 w-0 animate-[loadingBar_2s_ease-in-out_1.8s_forwards]"></div>
         </div>
         
-        <p className="mt-4 text-xs text-slate-500 font-mono tracking-widest opacity-0 animate-[pulse_2s_infinite_2s]">
+        <p className="mt-4 text-xs font-mono tracking-widest text-white font-bold opacity-0 animate-[fadeIn_1s_ease-out_2s_forwards]">
           CARREGANDO DADOS...
         </p>
       </div>

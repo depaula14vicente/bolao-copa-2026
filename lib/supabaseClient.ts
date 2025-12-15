@@ -64,12 +64,16 @@ create policy "Admins podem atualizar jogos" on public.matches for update using 
 create table if not exists public.bets (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references auth.users not null,
+  username text, -- Adicionado para facilitar leitura
   match_id text references public.matches(id) not null,
   score_a int not null,
   score_b int not null,
   created_at timestamptz default now(),
   unique(user_id, match_id)
 );
+
+-- SE A TABELA JÁ EXISTIR, RODE ISTO PARA ADICIONAR A COLUNA:
+-- alter table public.bets add column if not exists username text;
 
 alter table public.bets enable row level security;
 create policy "Apostas são visíveis por todos" on public.bets for select using (true);
@@ -80,11 +84,15 @@ create policy "Usuários podem atualizar suas apostas" on public.bets for update
 create table if not exists public.extra_bets (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references auth.users not null,
+  username text, -- Adicionado para facilitar leitura
   slug text not null,
   value text,
   created_at timestamptz default now(),
   unique(user_id, slug)
 );
+
+-- SE A TABELA JÁ EXISTIR, RODE ISTO PARA ADICIONAR A COLUNA:
+-- alter table public.extra_bets add column if not exists username text;
 
 alter table public.extra_bets enable row level security;
 create policy "Apostas extras são visíveis por todos" on public.extra_bets for select using (true);
@@ -92,7 +100,6 @@ create policy "Usuários podem inserir suas apostas extras" on public.extra_bets
 create policy "Usuários podem atualizar suas apostas extras" on public.extra_bets for update using (auth.uid() = user_id);
 
 -- 6. AUTOMATIZAÇÃO (TRIGGER) - CRUCIAL PARA EVITAR ERROS DE CADASTRO
--- Esta função cria o perfil automaticamente assim que o usuário é criado no Auth
 create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
@@ -112,10 +119,8 @@ begin
 end;
 $$;
 
--- Remove o trigger antigo se existir para evitar duplicação
 drop trigger if exists on_auth_user_created on auth.users;
 
--- Cria o trigger
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
@@ -125,6 +130,7 @@ create trigger on_auth_user_created
 export type DatabaseBet = {
   id: string;
   user_id: string;
+  username?: string;
   match_id: string;
   score_a: number;
   score_b: number;

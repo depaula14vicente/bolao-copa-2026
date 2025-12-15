@@ -113,9 +113,16 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ config, users, onUpdateC
           // Check if matches exist
           const { count } = await supabase.from('matches').select('*', { count: 'exact', head: true });
           
-          if (count === 0 || confirm("Deseja forçar a recriação da tabela de jogos?")) {
+          const confirmMsg = count && count > 0 
+            ? "Já existem jogos no banco. Deseja tentar atualizar/inserir faltantes? (Isso não apagará jogos existentes)" 
+            : "A tabela está vazia. Deseja inserir os jogos padrão?";
+
+          if (confirm(confirmMsg)) {
              
+              // IMPORTANTE: Incluímos o ID explícito aqui para garantir que 
+              // o ID do banco seja "1", "2", etc., igual ao do Mock/Frontend.
               const payload = MOCK_MATCHES.map(m => ({
+                id: m.id, // Força o ID correto
                 team_a: m.teamA,
                 team_b: m.teamB,
                 date_time: m.date,
@@ -124,14 +131,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ config, users, onUpdateC
                 is_brazil: m.isBrazil
               }));
 
-              const { error } = await supabase.from('matches').insert(payload);
+              const { error } = await supabase.from('matches').upsert(payload, { onConflict: 'id' });
               
               if (error) throw error;
               
-              alert("Jogos inseridos com sucesso! Recarregue a página.");
+              alert("Jogos sincronizados com sucesso! Recarregue a página para ver as mudanças.");
               window.location.reload();
-          } else {
-              alert("A tabela de jogos já está preenchida.");
           }
 
       } catch (err: any) {
@@ -218,7 +223,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ config, users, onUpdateC
                     <div>
                         <h4 className="font-bold text-blue-800 dark:text-blue-200">Criar/Sincronizar Tabela de Jogos</h4>
                         <p className="text-xs text-blue-600 dark:text-blue-300 mt-1">
-                            Se a tabela de jogos estiver vazia, clique aqui para preencher com os jogos padrão da Copa 2026.
+                            Se os palpites não estiverem aparecendo, clique aqui para corrigir os IDs dos jogos no banco de dados.
                         </p>
                     </div>
                 </div>
@@ -227,7 +232,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ config, users, onUpdateC
                     disabled={isSyncing}
                     className="whitespace-nowrap bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold py-2 px-4 rounded-lg flex items-center gap-2 text-sm shadow-sm"
                 >
-                    {isSyncing ? 'Sincronizando...' : 'Gerar Jogos Padrão'}
+                    {isSyncing ? 'Sincronizando...' : 'Sincronizar Jogos'}
                 </button>
             </div>
         </div>

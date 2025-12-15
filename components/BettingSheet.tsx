@@ -273,16 +273,17 @@ export const BettingSheet: React.FC<BettingSheetProps> = ({ matches, extraBets, 
       try {
           const { data: { user } } = await supabase.auth.getUser();
           
-          if (!user) throw new Error("Usuário não autenticado");
+          if (!user) throw new Error("Usuário não autenticado. Faça login novamente.");
 
-          // Collect all pending bets from the current matches state
-          const betsToSave = Array.from(pendingChanges).map(matchId => {
+          // Prepare payload
+          let betsToSave = Array.from(pendingChanges).map(matchId => {
               const match = matches.find(m => m.id === matchId);
               const bet = match?.bets?.[currentUser.username];
               
               if (match && bet) {
                   return {
                       user_id: user.id,
+                      username: currentUser.username, 
                       match_id: matchId,
                       score_a: bet.scoreA ?? 0, 
                       score_b: bet.scoreB ?? 0
@@ -292,18 +293,39 @@ export const BettingSheet: React.FC<BettingSheetProps> = ({ matches, extraBets, 
           }).filter(b => b !== null);
 
           if (betsToSave.length > 0) {
+              // Attempt 1: Full payload
               const { error } = await supabase.from('bets').upsert(betsToSave, { onConflict: 'user_id, match_id' });
-              if (error) throw error;
+              
+              if (error) {
+                  // Error handling strategy
+                  console.error("Erro Supabase:", error);
+
+                  // Case 1: Missing 'username' column (Schema mismatch)
+                  if (error.code === '42703' && error.message.includes('username')) {
+                      console.warn("Coluna username inexistente. Tentando salvar sem ela...");
+                      // Remove username and retry
+                      const minimalBets = betsToSave.map(({ username, ...rest }: any) => rest);
+                      const { error: retryError } = await supabase.from('bets').upsert(minimalBets, { onConflict: 'user_id, match_id' });
+                      if (retryError) throw retryError;
+                  } 
+                  // Case 2: Missing Match ID (Foreign Key Violation) -> Matches table empty
+                  else if (error.code === '23503') {
+                      throw new Error("A tabela de jogos não está sincronizada no banco de dados. Peça ao administrador para acessar o Painel Admin e clicar em 'Sincronizar Jogos'.");
+                  }
+                  else {
+                      throw error;
+                  }
+              }
           }
 
           // Success
           setPendingChanges(new Set());
           setSaveSuccess(true);
-          setTimeout(() => setSaveSuccess(false), 3000);
+          setTimeout(() => setSaveSuccess(false), 5000); // Increased timeout to 5 seconds
 
-      } catch (error) {
+      } catch (error: any) {
           console.error("Erro ao salvar palpites:", error);
-          alert("Erro ao salvar. Verifique sua conexão e tente novamente.");
+          alert(`Falha ao salvar: ${error.message || "Erro desconhecido"}`);
       } finally {
           setIsSaving(false);
       }
@@ -383,7 +405,8 @@ export const BettingSheet: React.FC<BettingSheetProps> = ({ matches, extraBets, 
     <div className="pb-24 animate-fade-in">
       
       {/* Progress & Tabs Header */}
-      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-4 mb-6 sticky top-[72px] z-30 transition-colors">
+      {/* Changed bg-white to bg-gray-50/slate-900 to match background and remove transparency issues */}
+      <div className="bg-gray-50 dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-4 mb-6 sticky top-[68px] z-30">
          <div className="flex flex-col gap-4">
              {/* Stats */}
              <div className="flex items-center justify-between text-xs sm:text-sm">
@@ -393,12 +416,12 @@ export const BettingSheet: React.FC<BettingSheetProps> = ({ matches, extraBets, 
                  </div>
                  <span className="text-slate-500 font-mono">{progressPercent}%</span>
              </div>
-             <div className="w-full h-2.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
+             <div className="w-full h-2.5 bg-gray-200 dark:bg-slate-800 rounded-full overflow-hidden border border-gray-300 dark:border-slate-700">
                  <div className="h-full bg-gradient-to-r from-green-500 to-yellow-500 transition-all duration-500" style={{ width: `${progressPercent}%` }}></div>
              </div>
 
              {/* Tab Switcher */}
-             <div className="flex p-1 bg-gray-100 dark:bg-slate-900 rounded-lg">
+             <div className="flex p-1 bg-gray-200 dark:bg-slate-800 rounded-lg">
                  <button 
                    onClick={() => setActiveTab('MATCHES')}
                    className={`flex-1 py-2 rounded-md text-sm font-bold flex items-center justify-center gap-2 transition-all ${activeTab === 'MATCHES' ? 'bg-white dark:bg-slate-700 text-green-600 dark:text-green-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
