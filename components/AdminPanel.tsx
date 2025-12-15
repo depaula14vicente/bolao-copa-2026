@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AppConfig, ScoringRule, PrizeConfig, User, Match, Notification } from '../types';
-import { Settings, Save, Target, RotateCcw, DollarSign, Percent, Zap, Plus, X, Users, CheckCircle, Bell, Send, CloudDownload, RefreshCw, Check, Wallet, Search, Filter } from 'lucide-react';
+import { Settings, Save, Target, RotateCcw, DollarSign, Percent, Zap, Plus, X, Users, CheckCircle, Bell, Send, Download, RefreshCw, Wallet, Search } from 'lucide-react';
 import { INITIAL_SCORING_RULES, INITIAL_TICKET_PRICE, INITIAL_PRIZE_DISTRIBUTION, INITIAL_SPECIAL_TEAMS, INITIAL_SPECIAL_PHASES, TEAMS_LIST, PHASES_LIST, MOCK_MATCHES } from '../constants';
 import { supabase } from '../lib/supabaseClient';
 
@@ -207,7 +207,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ config, users, onUpdateC
         {/* Section: Official Data Sync */}
         <div className="mb-8">
              <h3 className="text-sm font-bold uppercase text-slate-400 mb-4 flex items-center gap-2">
-                <CloudDownload size={16} />
+                <Download size={16} />
                 Dados Oficiais (FIFA)
             </h3>
             <div className="bg-blue-50 dark:bg-blue-900/10 p-4 rounded-lg border border-blue-200 dark:border-blue-800 flex flex-col md:flex-row items-center justify-between gap-4">

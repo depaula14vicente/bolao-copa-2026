@@ -297,7 +297,7 @@ export const App: React.FC = () => {
                   date: m.date_time,
                   group: m.group_name,
                   location: m.location,
-                  is_brazil: m.is_brazil,
+                  isBrazil: m.is_brazil, // Correctly mapping snake_case from DB to camelCase for TS
                   isFinal: false,
                   officialScoreA: m.official_score_a === null ? undefined : m.official_score_a,
                   officialScoreB: m.official_score_b === null ? undefined : m.official_score_b,
