@@ -249,70 +249,70 @@ export const App: React.FC = () => {
           setExtraBets(loadedExtras);
       }
 
-      // D. Load Matches - WITH FALLBACK
-      let { data: dbMatches, error: matchesError } = await supabase
-        .from('matches')
-        .select('*')
-        .order('date_time', { ascending: true });
-
-      let activeMatches = dbMatches;
-
-      // FALLBACK: If DB is empty or error, use MOCK data to ensure UI is never empty
-      if (!dbMatches || dbMatches.length === 0) {
-        console.warn("Database matches empty. Using local fallback.");
-        activeMatches = MOCK_MATCHES.map(m => ({
-            id: m.id,
-            team_a: m.teamA,
-            team_b: m.teamB,
-            date_time: m.date,
-            group_name: m.group,
-            location: m.location,
-            official_score_a: m.officialScoreA ?? null,
-            official_score_b: m.officialScoreB ?? null,
-            is_brazil: m.isBrazil
-        }));
+      // D. Load Matches - SMART MERGE STRATEGY
+      // CRITICAL: A fonte da verdade para a LISTA de jogos é o arquivo local (MOCK_MATCHES).
+      // O banco de dados (supabase) serve apenas para enriquecer com placares oficiais.
+      // Isso garante que todos os jogos apareçam, mesmo que não estejam criados no banco.
+      
+      const { data: dbMatches } = await supabase.from('matches').select('*');
+      
+      // Create a map for quick lookup of DB data
+      const dbMatchMap = new Map();
+      if (dbMatches) {
+          dbMatches.forEach((m: any) => dbMatchMap.set(String(m.id), m));
       }
 
       // E. Load Bets
       const { data: dbBets, error: betsError } = await supabase.from('bets').select('*');
       const validBets = dbBets || [];
 
-      if (activeMatches) {
-          const mergedMatches: Match[] = activeMatches.map((m: any) => {
-              const matchBets: Record<string, { scoreA: number, scoreB: number }> = {};
-              
-              // CRITICAL FIX: Ensure ID comparison handles string/int mismatch
-              // Supabase might return number, Local state uses string
-              const matchIdStr = m.id.toString();
+      // MERGE LOGIC: Iterate over the FULL Mock Schedule
+      const mergedMatches: Match[] = MOCK_MATCHES.map((mockMatch) => {
+          const matchIdStr = mockMatch.id.toString();
+          const dbMatch = dbMatchMap.get(matchIdStr);
 
-              validBets.filter((b: any) => b.match_id.toString() === matchIdStr).forEach((b: any) => {
-                  const username = userIdMap[b.user_id];
-                  if (username) {
-                      matchBets[username] = {
-                          scoreA: b.score_a,
-                          scoreB: b.score_b
-                      };
-                  }
-              });
+          // Use DB official scores if available (and valid numbers), otherwise undefined
+          const officialScoreA = (dbMatch && dbMatch.official_score_a !== null) ? dbMatch.official_score_a : undefined;
+          const officialScoreB = (dbMatch && dbMatch.official_score_b !== null) ? dbMatch.official_score_b : undefined;
 
-              return {
-                  id: m.id,
-                  teamA: m.team_a,
-                  teamB: m.team_b,
-                  date: m.date_time,
-                  group: m.group_name,
-                  location: m.location,
-                  isBrazil: m.is_brazil, // Correctly mapping snake_case from DB to camelCase for TS
-                  isFinal: false,
-                  officialScoreA: m.official_score_a === null ? undefined : m.official_score_a,
-                  officialScoreB: m.official_score_b === null ? undefined : m.official_score_b,
-                  bets: matchBets
-              };
+          // Map Bets for this match
+          const matchBets: Record<string, { scoreA: number, scoreB: number }> = {};
+          
+          let myBetA: number | undefined = undefined;
+          let myBetB: number | undefined = undefined;
+
+          validBets.filter((b: any) => String(b.match_id) === matchIdStr).forEach((b: any) => {
+              if (b.user_id === userId) {
+                  myBetA = b.score_a;
+                  myBetB = b.score_b;
+              }
+              const username = userIdMap[b.user_id];
+              if (username) {
+                  matchBets[username] = {
+                      scoreA: b.score_a,
+                      scoreB: b.score_b
+                  };
+              }
           });
-          setMatches(mergedMatches);
-      } else {
-          setMatches([]);
-      }
+
+          return {
+              id: mockMatch.id,
+              teamA: mockMatch.teamA,
+              teamB: mockMatch.teamB,
+              date: mockMatch.date,
+              group: mockMatch.group,
+              location: mockMatch.location,
+              isBrazil: mockMatch.isBrazil,
+              isFinal: false,
+              officialScoreA,
+              officialScoreB,
+              userScoreA: myBetA, // Used by UI
+              userScoreB: myBetB, // Used by UI
+              bets: matchBets
+          };
+      });
+
+      setMatches(mergedMatches);
 
     } catch (error: any) {
       console.error("Error loading data:", error);
@@ -364,28 +364,32 @@ export const App: React.FC = () => {
   const handleExtraBetsChange = async (newBets: ExtraBet) => {
     setExtraBets(newBets);
     const changedKey = Object.keys(newBets).find(key => newBets[key as keyof ExtraBet] !== extraBets[key as keyof ExtraBet]);
+    
     if (changedKey) {
-        const { data: { user: authUser } } = await supabase.auth.getUser();
-        if (authUser && user) {
-             const value = newBets[changedKey as keyof ExtraBet];
-             const payload: any = {
-                 user_id: authUser.id,
-                 username: user.username, 
-                 slug: changedKey,
-                 value: value
-             };
+        try {
+            const { data: { user: authUser } } = await supabase.auth.getUser();
+            if (authUser) {
+                 const value = newBets[changedKey as keyof ExtraBet];
+                 
+                 // CORREÇÃO: Payload limpo, apenas o necessário para a tabela extra_bets
+                 const payload = {
+                     user_id: authUser.id,
+                     slug: changedKey,
+                     value: String(value || '') // Garante que seja string
+                 };
 
-             const { error } = await supabase.from('extra_bets').upsert(payload, { onConflict: 'user_id, slug' });
-             
-             if (error) {
-                 if (error.code === '42703' && error.message.includes('username')) {
-                     // Retry without username column
-                     delete payload.username;
-                     await supabase.from('extra_bets').upsert(payload, { onConflict: 'user_id, slug' });
-                 } else {
-                     console.error("Error saving extra bet:", error);
+                 // Upsert simples e direto
+                 const { error } = await supabase
+                     .from('extra_bets')
+                     .upsert(payload, { onConflict: 'user_id, slug' }); // Importante: sem espaços na string do onConflict se possível, mas o driver trata isso.
+                 
+                 if (error) {
+                     console.error("Erro ao salvar aposta extra:", error);
+                     // Opcional: Reverter estado local se der erro crítico
                  }
-             }
+            }
+        } catch (error: any) {
+            console.error("Exceção ao salvar:", error);
         }
     }
   };

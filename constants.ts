@@ -69,31 +69,20 @@ export const RULES_TEXT = {
   ]
 };
 
-// 48 Teams for 2026
-const TEAMS_SOURCE = [
-  "África do Sul", "Alemanha", "Arábia Saudita", "Argélia", "Argentina", "Austrália", "Áustria", 
-  "Bélgica", "Brasil", "Cabo Verde", "Camarões", "Canadá", "Catar", "Chile", "Colômbia", "Coreia do Sul", 
-  "Costa do Marfim", "Costa Rica", "Croácia", "Curaçao", "Dinamarca", "Egito", "Equador", 
-  "Escócia", "Espanha", "EUA", "França", "Gana", "Haiti", "Holanda", "Hungria", "Inglaterra", 
-  "Irã", "Itália", "Japão", "Jordânia", "Marrocos", "México", "Nigéria", "Noruega", 
-  "Nova Zelândia", "Panamá", "Paraguai", "Peru", "Polônia", "Portugal", "Senegal", "Sérvia", 
-  "Suécia", "Suíça", "Tunísia", "Uruguai", "Usbequistão"
-];
-
-// Group Definitions
+// Group Definitions (Updated based on Official Table)
 const GROUPS_DEF = {
-    A: ['México', 'África do Sul', 'Coreia do Sul', 'Dinamarca'],
-    B: ['Canadá', 'Sérvia', 'Catar', 'Suíça'],
+    A: ['México', 'África do Sul', 'Coreia do Sul', 'UEFA D'],
+    B: ['Canadá', 'UEFA A', 'Catar', 'Suíça'],
     C: ['Brasil', 'Marrocos', 'Haiti', 'Escócia'],
-    D: ['EUA', 'Paraguai', 'Austrália', 'Hungria'],
+    D: ['EUA', 'Paraguai', 'Austrália', 'UEFA C'],
     E: ['Alemanha', 'Curaçao', 'Costa do Marfim', 'Equador'],
-    F: ['Holanda', 'Japão', 'Chile', 'Tunísia'],
+    F: ['Holanda', 'Japão', 'UEFA B', 'Tunísia'],
     G: ['Bélgica', 'Irã', 'Nova Zelândia', 'Egito'],
     H: ['Espanha', 'Cabo Verde', 'Arábia Saudita', 'Uruguai'],
-    I: ['França', 'Senegal', 'Itália', 'Noruega'],
-    J: ['Portugal', 'Áustria', 'Gana', 'Costa Rica'],
-    K: ['Argentina', 'Croácia', 'Nigéria', 'Jordânia'],
-    L: ['Inglaterra', 'Colômbia', 'Suécia', 'Uzbequistão']
+    I: ['França', 'Senegal', 'FIFA 2', 'Noruega'],
+    J: ['Argentina', 'Argélia', 'Áustria', 'Jordânia'],
+    K: ['Portugal', 'FIFA 1', 'Uzbequistão', 'Colômbia'],
+    L: ['Inglaterra', 'Gana', 'Croácia', 'Panamá']
 };
 
 export const TEAMS_LIST = Object.values(GROUPS_DEF).flat().sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }));
@@ -117,13 +106,13 @@ export const MOCK_SQUADS: Record<string, string[]> = {
   "Inglaterra": sortSquad(["Harry Kane", "Jude Bellingham", "Bukayo Saka", "Phil Foden", "Cole Palmer", "Ollie Watkins", "Ivan Toney", "Jack Grealish", "Marcus Rashford"]),
   "Portugal": sortSquad(["Cristiano Ronaldo", "Bruno Fernandes", "Bernardo Silva", "Rafael Leão", "João Félix", "Diogo Jota", "Gonçalo Ramos", "Pedro Neto"]),
   "Espanha": sortSquad(["Lamine Yamal", "Álvaro Morata", "Nico Williams", "Dani Olmo", "Pedri", "Ferran Torres", "Mikel Oyarzabal", "Joselu"]),
-  "Itália": sortSquad(["Federico Chiesa", "Gianluca Scamacca", "Mateo Retegui", "Nicolò Barella", "Lorenzo Pellegrini"]),
   "Holanda": sortSquad(["Cody Gakpo", "Memphis Depay", "Xavi Simons", "Wout Weghorst", "Donyell Malen"]),
   "Uruguai": sortSquad(["Darwin Núñez", "Luis Suárez", "Federico Valverde", "Facundo Pellistri", "Maxi Araújo"]),
   "Bélgica": sortSquad(["Romelu Lukaku", "Kevin De Bruyne", "Jérémy Doku", "Leandro Trossard", "Loïs Openda"]),
   "EUA": sortSquad(["Christian Pulisic", "Timothy Weah", "Gio Reyna", "Folarin Balogun", "Weston McKennie"]),
   "México": sortSquad(["Santiago Giménez", "Hirving Lozano", "Uriel Antuna", "Edson Álvarez", "Julián Quiñones"]),
   "Colômbia": sortSquad(["Luis Díaz", "James Rodríguez", "Jhon Córdoba", "Rafael Borré", "Jhon Durán"]),
+  "Croácia": sortSquad(["Luka Modrić", "Andrej Kramarić", "Ivan Perišić", "Mateo Kovačić", "Joško Gvardiol"]),
   // Generic fallback for others
   "default": sortSquad(["Atacante Principal", "Camisa 10", "Centroavante", "Ponta Direita", "Ponta Esquerda", "Meia Ofensivo"])
 };
@@ -136,13 +125,42 @@ export const PHASES_LIST = [
 
 export const TEAM_FLAGS: Record<string, string> = {
   "África do Sul": "za", "Alemanha": "de", "Arábia Saudita": "sa", "Argélia": "dz", "Argentina": "ar", "Austrália": "au", "Áustria": "at",
-  "Bélgica": "be", "Brasil": "br", "Cabo Verde": "cv", "Camarões": "cm", "Canadá": "ca", "Catar": "qa", "Chile": "cl", "Colômbia": "co", "Coreia do Sul": "kr",
-  "Costa do Marfim": "ci", "Costa Rica": "cr", "Croácia": "hr", "Curaçao": "cw", "Dinamarca": "dk", "Egito": "eg", "Equador": "ec",
-  "Escócia": "gb-sct", "Espanha": "es", "EUA": "us", "França": "fr", "Gana": "gh", "Haiti": "ht", "Holanda": "nl", "Hungria": "hu",
+  "Bélgica": "be", "Brasil": "br", "Cabo Verde": "cv", "Canadá": "ca", "Catar": "qa", "Colômbia": "co", "Coreia do Sul": "kr",
+  "Costa do Marfim": "ci", "Curaçao": "cw", "Croácia": "hr", "Egito": "eg", "Equador": "ec",
+  "Escócia": "gb-sct", "Espanha": "es", "EUA": "us", "França": "fr", "Gana": "gh", "Haiti": "ht", "Holanda": "nl",
   "Inglaterra": "gb-eng", "Irã": "ir", "Itália": "it", "Japão": "jp", "Jordânia": "jo", "Marrocos": "ma",
-  "México": "mx", "Nigéria": "ng", "Noruega": "no", "Nova Zelândia": "nz", "Panamá": "pa", "Paraguai": "py", "Peru": "pe", 
-  "Polônia": "pl", "Portugal": "pt", "Senegal": "sn", "Sérvia": "rs", "Suécia": "se", "Suíça": "ch", "Tunísia": "tn", 
-  "Uruguai": "uy", "Usbequistão": "uz"
+  "México": "mx", "Noruega": "no", "Nova Zelândia": "nz", "Panamá": "pa", "Paraguai": "py", 
+  "Portugal": "pt", "Senegal": "sn", "Suíça": "ch", "Tunísia": "tn", 
+  "Uruguai": "uy", "Uzbequistão": "uz",
+  // Playoff Teams Flags
+  "Jamaica": "jm", "Nova Caledônia": "nc", "República Democrática do Congo": "cd",
+  "Bolívia": "bo", "Iraque": "iq", "Suriname": "sr",
+  "Bósnia e Herzegovina": "ba", "Irlanda do Norte": "gb-nir", "País de Gales": "gb-wls",
+  "Albânia": "al", "Polônia": "pl", "Suécia": "se", "Ucrânia": "ua",
+  "Eslováquia": "sk", "Kosovo": "xk", "Romênia": "ro", "Turquia": "tr",
+  "Dinamarca": "dk", "Irlanda": "ie", "Macedônia do Norte": "mk", "República Tcheca": "cz",
+  // Generic placeholders handled by UI, no flag code for the placeholder itself
+  "UEFA A": "", "UEFA B": "", "UEFA C": "", "UEFA D": "",
+  "FIFA 1": "", "FIFA 2": ""
+};
+
+export const PLAYOFF_TEAMS: Record<string, string[]> = {
+  "FIFA 1": ["Jamaica", "Nova Caledônia", "República Democrática do Congo"],
+  "FIFA 2": ["Bolívia", "Iraque", "Suriname"],
+  "UEFA A": ["Bósnia e Herzegovina", "Irlanda do Norte", "Itália", "País de Gales"],
+  "UEFA B": ["Albânia", "Polônia", "Suécia", "Ucrânia"],
+  "UEFA C": ["Eslováquia", "Kosovo", "Romênia", "Turquia"],
+  "UEFA D": ["Dinamarca", "Irlanda", "Macedônia do Norte", "República Tcheca"]
+};
+
+// Map playoff keys to World Cup Groups
+export const PLAYOFF_TO_GROUP: Record<string, string> = {
+  "FIFA 1": "Grupo K",
+  "FIFA 2": "Grupo I",
+  "UEFA A": "Grupo B",
+  "UEFA B": "Grupo F",
+  "UEFA C": "Grupo D",
+  "UEFA D": "Grupo A"
 };
 
 // Locations mapped to Stadiums (Official 2026 Venues)
@@ -194,43 +212,43 @@ const generateSchedule = (): Match[] => {
   };
 
   // --- GROUP A ---
-  // Mexico, Africa S, Korea S, Dinamarca
+  // México, África do Sul, Coreia do Sul, UEFA D
   addMatch('A', '11/06 - 16H', LOCS.MEX, 'México', 'África do Sul');
-  addMatch('A', '11/06 - 23H', LOCS.GUA, 'Coreia do Sul', 'Dinamarca');
-  addMatch('A', '18/06 - 13H', LOCS.ATL, 'África do Sul', 'Dinamarca');
+  addMatch('A', '11/06 - 23H', LOCS.GUA, 'Coreia do Sul', 'UEFA D');
+  addMatch('A', '18/06 - 13H', LOCS.ATL, 'África do Sul', 'UEFA D');
   addMatch('A', '18/06 - 22H', LOCS.GUA, 'México', 'Coreia do Sul');
-  addMatch('A', '24/06 - 22H', LOCS.MEX, 'México', 'Dinamarca');
+  addMatch('A', '24/06 - 22H', LOCS.MEX, 'UEFA D', 'México');
   addMatch('A', '24/06 - 22H', LOCS.MON, 'África do Sul', 'Coreia do Sul');
 
   // --- GROUP B ---
-  // Canada, Serbia, Qatar, Switzerland
-  addMatch('B', '12/06 - 16H', LOCS.TOR, 'Canadá', 'Sérvia');
+  // Canadá, UEFA A, Catar, Suíça
+  addMatch('B', '12/06 - 16H', LOCS.TOR, 'Canadá', 'UEFA A');
   addMatch('B', '13/06 - 16H', LOCS.SF, 'Catar', 'Suíça');
-  addMatch('B', '18/06 - 16H', LOCS.LA, 'Suíça', 'Sérvia');
+  addMatch('B', '18/06 - 16H', LOCS.LA, 'UEFA A', 'Suíça');
   addMatch('B', '18/06 - 19H', LOCS.VAN, 'Canadá', 'Catar');
   addMatch('B', '24/06 - 16H', LOCS.VAN, 'Suíça', 'Canadá');
-  addMatch('B', '24/06 - 16H', LOCS.SEA, 'Sérvia', 'Catar');
+  addMatch('B', '24/06 - 16H', LOCS.SEA, 'UEFA A', 'Catar');
 
   // --- GROUP C ---
-  // Brazil, Morocco, Haiti, Scotland
+  // Brasil, Marrocos, Haiti, Escócia
   addMatch('C', '13/06 - 19H', LOCS.NYC, 'Brasil', 'Marrocos');
   addMatch('C', '13/06 - 22H', LOCS.BOS, 'Haiti', 'Escócia');
   addMatch('C', '19/06 - 19H', LOCS.BOS, 'Escócia', 'Marrocos');
   addMatch('C', '19/06 - 22H', LOCS.PHI, 'Brasil', 'Haiti');
-  addMatch('C', '24/06 - 19H', LOCS.MIA, 'Marrocos', 'Haiti');
-  addMatch('C', '24/06 - 19H', LOCS.ATL, 'Brasil', 'Escócia');
+  addMatch('C', '24/06 - 19H', LOCS.MIA, 'Escócia', 'Brasil');
+  addMatch('C', '24/06 - 19H', LOCS.ATL, 'Marrocos', 'Haiti');
 
   // --- GROUP D ---
-  // USA, Paraguay, Australia, Hungary
+  // EUA, Paraguai, Austrália, UEFA C
   addMatch('D', '12/06 - 22H', LOCS.LA, 'EUA', 'Paraguai');
-  addMatch('D', '14/06 - 13H', LOCS.VAN, 'Austrália', 'Hungria');
-  addMatch('D', '19/06 - 01H', LOCS.SF, 'Hungria', 'Paraguai');
+  addMatch('D', '14/06 - 13H', LOCS.VAN, 'Austrália', 'UEFA C');
+  addMatch('D', '19/06 - 01H', LOCS.SF, 'UEFA C', 'Paraguai');
   addMatch('D', '19/06 - 16H', LOCS.SEA, 'EUA', 'Austrália');
-  addMatch('D', '25/06 - 23H', LOCS.LA, 'Hungria', 'EUA');
+  addMatch('D', '25/06 - 23H', LOCS.LA, 'UEFA C', 'EUA');
   addMatch('D', '25/06 - 23H', LOCS.SF, 'Paraguai', 'Austrália');
 
   // --- GROUP E ---
-  // Germany, Curacao, Ivory Coast, Ecuador
+  // Alemanha, Curaçao, Costa do Marfim, Equador
   addMatch('E', '14/06 - 14H', LOCS.HOU, 'Alemanha', 'Curaçao');
   addMatch('E', '14/06 - 20H', LOCS.PHI, 'Costa do Marfim', 'Equador');
   addMatch('E', '20/06 - 17H', LOCS.TOR, 'Alemanha', 'Costa do Marfim');
@@ -239,25 +257,25 @@ const generateSchedule = (): Match[] => {
   addMatch('E', '25/06 - 17H', LOCS.PHI, 'Curaçao', 'Costa do Marfim');
 
   // --- GROUP F ---
-  // Netherlands, Japan, Chile, Tunisia
+  // Holanda, Japão, UEFA B, Tunísia
   addMatch('F', '14/06 - 17H', LOCS.DAL, 'Holanda', 'Japão');
-  addMatch('F', '14/06 - 23H', LOCS.MON, 'Chile', 'Tunísia');
+  addMatch('F', '14/06 - 23H', LOCS.MON, 'UEFA B', 'Tunísia');
   addMatch('F', '20/06 - 01H', LOCS.MON, 'Tunísia', 'Japão');
-  addMatch('F', '20/06 - 14H', LOCS.HOU, 'Holanda', 'Chile');
+  addMatch('F', '20/06 - 14H', LOCS.HOU, 'Holanda', 'UEFA B');
   addMatch('F', '25/06 - 20H', LOCS.KC, 'Tunísia', 'Holanda');
-  addMatch('F', '25/06 - 20H', LOCS.DAL, 'Japão', 'Chile');
+  addMatch('F', '25/06 - 20H', LOCS.DAL, 'Japão', 'UEFA B');
 
   // --- GROUP G ---
-  // Belgium, Iran, New Zealand, Egypt
-  addMatch('G', '15/06 - 16H', LOCS.SEA, 'Bélgica', 'Irã');
-  addMatch('G', '15/06 - 22H', LOCS.LA, 'Nova Zelândia', 'Egito');
-  addMatch('G', '21/06 - 16H', LOCS.LA, 'Bélgica', 'Nova Zelândia');
-  addMatch('G', '21/06 - 22H', LOCS.VAN, 'Egito', 'Irã');
-  addMatch('G', '27/06 - 00H', LOCS.VAN, 'Nova Zelândia', 'Irã');
-  addMatch('G', '27/06 - 00H', LOCS.SEA, 'Bélgica', 'Egito');
+  // Bélgica, Irã, Nova Zelândia, Egito
+  addMatch('G', '15/06 - 16H', LOCS.SEA, 'Bélgica', 'Egito');
+  addMatch('G', '15/06 - 22H', LOCS.LA, 'Irã', 'Nova Zelândia');
+  addMatch('G', '21/06 - 16H', LOCS.LA, 'Bélgica', 'Irã');
+  addMatch('G', '21/06 - 22H', LOCS.VAN, 'Nova Zelândia', 'Egito');
+  addMatch('G', '27/06 - 00H', LOCS.VAN, 'Nova Zelândia', 'Bélgica');
+  addMatch('G', '27/06 - 00H', LOCS.SEA, 'Egito', 'Irã');
 
   // --- GROUP H ---
-  // Spain, Cabo Verde, Saudi, Uruguay
+  // Espanha, Cabo Verde, Arábia Saudita, Uruguai
   addMatch('H', '15/06 - 13H', LOCS.ATL, 'Espanha', 'Cabo Verde');
   addMatch('H', '15/06 - 19H', LOCS.MIA, 'Arábia Saudita', 'Uruguai');
   addMatch('H', '21/06 - 13H', LOCS.ATL, 'Espanha', 'Arábia Saudita');
@@ -266,40 +284,40 @@ const generateSchedule = (): Match[] => {
   addMatch('H', '26/06 - 21H', LOCS.HOU, 'Cabo Verde', 'Arábia Saudita');
 
   // --- GROUP I ---
-  // France, Senegal, Italy, Norway
+  // França, Senegal, FIFA 2, Noruega
   addMatch('I', '16/06 - 16H', LOCS.NYC, 'França', 'Senegal');
-  addMatch('I', '16/06 - 19H', LOCS.BOS, 'Itália', 'Noruega');
-  addMatch('I', '22/06 - 16H', LOCS.NYC, 'França', 'Itália');
-  addMatch('I', '22/06 - 19H', LOCS.TOR, 'Noruega', 'Senegal');
-  addMatch('I', '26/06 - 17H', LOCS.BOS, 'Noruega', 'França');
-  addMatch('I', '26/06 - 17H', LOCS.PHI, 'Senegal', 'Itália');
+  addMatch('I', '16/06 - 19H', LOCS.BOS, 'FIFA 2', 'Noruega');
+  addMatch('I', '22/06 - 18H', LOCS.PHI, 'França', 'FIFA 2');
+  addMatch('I', '22/06 - 21H', LOCS.NYC, 'Noruega', 'Senegal');
+  addMatch('I', '26/06 - 16H', LOCS.BOS, 'Noruega', 'França');
+  addMatch('I', '26/06 - 16H', LOCS.TOR, 'Senegal', 'FIFA 2');
 
   // --- GROUP J ---
-  // Portugal, Austria, Ghana, Costa Rica
-  addMatch('J', '16/06 - 13H', LOCS.SF, 'Portugal', 'Áustria');
-  addMatch('J', '16/06 - 22H', LOCS.SEA, 'Gana', 'Costa Rica');
-  addMatch('J', '22/06 - 13H', LOCS.SF, 'Portugal', 'Gana');
-  addMatch('J', '22/06 - 22H', LOCS.LA, 'Costa Rica', 'Áustria');
-  addMatch('J', '27/06 - 23H', LOCS.LA, 'Costa Rica', 'Portugal');
-  addMatch('J', '27/06 - 23H', LOCS.SEA, 'Áustria', 'Gana');
+  // Argentina, Argélia, Áustria, Jordânia
+  addMatch('J', '16/06 - 22H', LOCS.KC, 'Argentina', 'Argélia');
+  addMatch('J', '17/06 - 01H', LOCS.SF, 'Áustria', 'Jordânia');
+  addMatch('J', '22/06 - 14H', LOCS.DAL, 'Argentina', 'Áustria');
+  addMatch('J', '23/06 - 00H', LOCS.SF, 'Jordânia', 'Argélia');
+  addMatch('J', '27/06 - 23H', LOCS.DAL, 'Jordânia', 'Argentina');
+  addMatch('J', '27/06 - 23H', LOCS.KC, 'Argélia', 'Áustria');
 
   // --- GROUP K ---
-  // Argentina, Croatia, Nigeria, Jordan
-  addMatch('K', '17/06 - 16H', LOCS.HOU, 'Argentina', 'Croácia');
-  addMatch('K', '17/06 - 19H', LOCS.DAL, 'Nigéria', 'Jordânia');
-  addMatch('K', '23/06 - 16H', LOCS.HOU, 'Argentina', 'Nigéria');
-  addMatch('K', '23/06 - 19H', LOCS.KC, 'Jordânia', 'Croácia');
-  addMatch('K', '28/06 - 20H', LOCS.KC, 'Jordânia', 'Argentina');
-  addMatch('K', '28/06 - 20H', LOCS.DAL, 'Croácia', 'Nigéria');
+  // Portugal, FIFA 1, Uzbequistão, Colômbia
+  addMatch('K', '17/06 - 14H', LOCS.HOU, 'Portugal', 'FIFA 1');
+  addMatch('K', '17/06 - 23H', LOCS.MEX, 'Uzbequistão', 'Colômbia');
+  addMatch('K', '23/06 - 14H', LOCS.HOU, 'Portugal', 'Uzbequistão');
+  addMatch('K', '23/06 - 23H', LOCS.GUA, 'Colômbia', 'FIFA 1');
+  addMatch('K', '27/06 - 20H', LOCS.MIA, 'Colômbia', 'Portugal');
+  addMatch('K', '27/06 - 20H', LOCS.ATL, 'FIFA 1', 'Uzbequistão');
 
   // --- GROUP L ---
-  // England, Colombia, Sweden, Uzbekistan
-  addMatch('L', '17/06 - 13H', LOCS.ATL, 'Inglaterra', 'Colômbia');
-  addMatch('L', '17/06 - 21H', LOCS.MIA, 'Suécia', 'Uzbequistão');
-  addMatch('L', '23/06 - 13H', LOCS.ATL, 'Inglaterra', 'Suécia');
-  addMatch('L', '23/06 - 21H', LOCS.GUA, 'Uzbequistão', 'Colômbia');
-  addMatch('L', '28/06 - 17H', LOCS.MIA, 'Uzbequistão', 'Inglaterra');
-  addMatch('L', '28/06 - 17H', LOCS.MON, 'Colômbia', 'Suécia');
+  // Inglaterra, Gana, Croácia, Panamá
+  addMatch('L', '17/06 - 17H', LOCS.DAL, 'Inglaterra', 'Croácia');
+  addMatch('L', '17/06 - 20H', LOCS.TOR, 'Gana', 'Panamá');
+  addMatch('L', '23/06 - 17H', LOCS.BOS, 'Inglaterra', 'Gana');
+  addMatch('L', '23/06 - 20H', LOCS.TOR, 'Panamá', 'Croácia');
+  addMatch('L', '27/06 - 18H', LOCS.NYC, 'Panamá', 'Inglaterra');
+  addMatch('L', '27/06 - 18H', LOCS.PHI, 'Croácia', 'Gana');
 
   return matches;
 };
