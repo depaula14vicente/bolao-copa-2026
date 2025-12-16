@@ -59,7 +59,8 @@ export const App: React.FC = () => {
   // 1. Check Session & Load Data
   useEffect(() => {
     // Check active session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then((response) => {
+      const session = response.data.session;
       if (session) {
         loadData(session.user.id);
       } else {
@@ -69,7 +70,7 @@ export const App: React.FC = () => {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((_event: string, session: any) => {
       if (session) {
         loadData(session.user.id);
       } else {
@@ -218,7 +219,7 @@ export const App: React.FC = () => {
       const userIdMap: Record<string, string> = {}; 
 
       if (allProfiles) {
-        const mappedUsers: User[] = allProfiles.map(p => {
+        const mappedUsers: User[] = allProfiles.map((p: any) => {
             userIdMap[p.id] = p.username; 
             return {
                 username: p.username,
@@ -370,22 +371,34 @@ export const App: React.FC = () => {
             const { data: { user: authUser } } = await supabase.auth.getUser();
             if (authUser) {
                  const value = newBets[changedKey as keyof ExtraBet];
-                 
-                 // CORREÇÃO: Payload limpo, apenas o necessário para a tabela extra_bets
-                 const payload = {
-                     user_id: authUser.id,
-                     slug: changedKey,
-                     value: String(value || '') // Garante que seja string
-                 };
+                 const slug = changedKey;
 
-                 // Upsert simples e direto
-                 const { error } = await supabase
-                     .from('extra_bets')
-                     .upsert(payload, { onConflict: 'user_id, slug' }); // Importante: sem espaços na string do onConflict se possível, mas o driver trata isso.
+                 // Lógica Atualizada: Se o valor for vazio, DELETA o registro para limpar o banco.
+                 // Se tiver valor, faz UPSERT.
                  
-                 if (error) {
-                     console.error("Erro ao salvar aposta extra:", error);
-                     // Opcional: Reverter estado local se der erro crítico
+                 if (!value || value.trim() === '') {
+                     // Delete
+                     const { error } = await supabase
+                        .from('extra_bets')
+                        .delete()
+                        .eq('user_id', authUser.id)
+                        .eq('slug', slug);
+                     
+                     if (error) console.error("Erro ao limpar aposta extra:", error);
+
+                 } else {
+                     // Upsert
+                     const payload = {
+                         user_id: authUser.id,
+                         slug: slug,
+                         value: String(value)
+                     };
+
+                     const { error } = await supabase
+                         .from('extra_bets')
+                         .upsert(payload, { onConflict: 'user_id, slug' });
+                     
+                     if (error) console.error("Erro ao salvar aposta extra:", error);
                  }
             }
         } catch (error: any) {
@@ -620,7 +633,7 @@ export const App: React.FC = () => {
                       <button 
                         onClick={() => {
                             setLoading(true);
-                            supabase.auth.getUser().then(({ data }) => {
+                            supabase.auth.getUser().then(({data}) => {
                                 if(data.user) loadData(data.user.id);
                                 else setLoading(false);
                             });
