@@ -59,7 +59,7 @@ export const App: React.FC = () => {
   // 1. Check Session & Load Data
   useEffect(() => {
     // Check active session
-    supabase.auth.getSession().then((response) => {
+    supabase.auth.getSession().then((response: any) => {
       const session = response.data.session;
       if (session) {
         loadData(session.user.id);
@@ -633,7 +633,7 @@ export const App: React.FC = () => {
                       <button 
                         onClick={() => {
                             setLoading(true);
-                            supabase.auth.getUser().then(({data}) => {
+                            supabase.auth.getUser().then(({data}: any) => {
                                 if(data.user) loadData(data.user.id);
                                 else setLoading(false);
                             });
