@@ -34,28 +34,31 @@ export const MatchDetailsModal: React.FC<MatchDetailsModalProps> = ({ match, use
             const uA = bet.scoreA;
             const uB = bet.scoreB;
 
-            if (uA === oA && uB === oB) {
-                points = (scoringRules.find(r => r.id === '1')?.points || 6) * multiplier;
-                status = 'exact';
-            } else {
-                const userWinner = uA > uB ? 'A' : (uB > uA ? 'B' : 'Draw');
-                const officialWinner = oA > oB ? 'A' : (oB > oA ? 'B' : 'Draw');
-
-                if (userWinner === officialWinner) {
-                    if (userWinner === 'Draw') {
-                        points = (scoringRules.find(r => r.id === '4')?.points || 2) * multiplier;
-                        status = 'draw';
-                    } else {
-                        if (uA === oA || uB === oB) {
-                            points = (scoringRules.find(r => r.id === '2')?.points || 3) * multiplier;
-                            status = 'winner'; // Vencedor + 1 placar
-                        } else {
-                            points = (scoringRules.find(r => r.id === '3')?.points || 2) * multiplier;
-                            status = 'winner';
-                        }
-                    }
+            // FIX: Garantir que uA e uB não sejam undefined antes de comparar
+            if (uA !== undefined && uB !== undefined) {
+                if (uA === oA && uB === oB) {
+                    points = (scoringRules.find(r => r.id === '1')?.points || 6) * multiplier;
+                    status = 'exact';
                 } else {
-                    status = 'loss';
+                    const userWinner = uA > uB ? 'A' : (uB > uA ? 'B' : 'Draw');
+                    const officialWinner = oA > oB ? 'A' : (oB > oA ? 'B' : 'Draw');
+
+                    if (userWinner === officialWinner) {
+                        if (userWinner === 'Draw') {
+                            points = (scoringRules.find(r => r.id === '4')?.points || 2) * multiplier;
+                            status = 'draw';
+                        } else {
+                            if (uA === oA || uB === oB) {
+                                points = (scoringRules.find(r => r.id === '2')?.points || 3) * multiplier;
+                                status = 'winner'; // Vencedor + 1 placar
+                            } else {
+                                points = (scoringRules.find(r => r.id === '3')?.points || 2) * multiplier;
+                                status = 'winner';
+                            }
+                        }
+                    } else {
+                        status = 'loss';
+                    }
                 }
             }
         }
