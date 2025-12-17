@@ -194,7 +194,8 @@ const generateSchedule = (): Match[] => {
     const officialScoreA = undefined;
     const officialScoreB = undefined;
     
-    const bets: Record<string, { scoreA: number, scoreB: number }> = {};
+    // CORREÇÃO: Tipagem para permitir undefined e satisfazer o compilador
+    const bets: Record<string, { scoreA: number | undefined, scoreB: number | undefined }> = {};
 
     matches.push({
       id,

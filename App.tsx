@@ -278,7 +278,8 @@ export const App: React.FC = () => {
           const officialScoreB = (dbMatch && dbMatch.official_score_b !== null) ? dbMatch.official_score_b : undefined;
 
           // Map Bets for this match
-          const matchBets: Record<string, { scoreA: number, scoreB: number }> = {};
+          // CORREÇÃO: Tipagem para permitir undefined
+          const matchBets: Record<string, { scoreA: number | undefined, scoreB: number | undefined }> = {};
           
           let myBetA: number | undefined = undefined;
           let myBetB: number | undefined = undefined;
@@ -450,7 +451,15 @@ export const App: React.FC = () => {
             const officialA = match.officialScoreA;
             const officialB = match.officialScoreB;
             
-            if (bet && officialA !== undefined && officialB !== undefined && officialA !== null && officialB !== null) {
+            // CORREÇÃO: Verificação de undefined no bet
+            if (bet && 
+                bet.scoreA !== undefined && 
+                bet.scoreB !== undefined && 
+                officialA !== undefined && 
+                officialB !== undefined && 
+                officialA !== null && 
+                officialB !== null) {
+                
                 let matchPoints = 0;
                 let isExact = false;
 

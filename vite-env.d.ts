@@ -1,16 +1,43 @@
-// Type definitions
-// Remove failing references if files are missing in environment
+// Replaced missing 'vite/client' reference with manual definitions to fix build errors
 // /// <reference types="vite/client" />
-// /// <reference types="vite-plugin-pwa/client" />
 
-declare module 'virtual:pwa-register' {
-  export interface RegisterSWOptions {
-    immediate?: boolean
-    onNeedRefresh?: () => void
-    onOfflineReady?: () => void
-    onRegistered?: (registration: ServiceWorkerRegistration | undefined) => void
-    onRegisterError?: (error: any) => void
-  }
+declare module '*.svg' {
+  import * as React from 'react';
+  export const ReactComponent: React.FunctionComponent<React.SVGProps<SVGSVGElement> & { title?: string }>;
+  const src: string;
+  export default src;
+}
 
-  export function registerSW(options?: RegisterSWOptions): (reloadPage?: boolean) => Promise<void>
+declare module '*.png' {
+  const src: string;
+  export default src;
+}
+
+declare module '*.jpg' {
+  const src: string;
+  export default src;
+}
+
+declare module '*.jpeg' {
+  const src: string;
+  export default src;
+}
+
+declare module '*.gif' {
+  const src: string;
+  export default src;
+}
+
+declare module '*.webp' {
+  const src: string;
+  export default src;
+}
+
+interface ImportMetaEnv {
+  readonly VITE_APP_TITLE: string
+  [key: string]: any
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv
 }

@@ -414,6 +414,19 @@ export const BettingSheet: React.FC<BettingSheetProps> = ({
        {viewMode === 'EXTRAS' && (
            <div className="space-y-6 animate-fade-in">
                
+               {/* Banner Palpites Extras */}
+               <div className="bg-yellow-500 rounded-xl p-6 text-white relative overflow-hidden shadow-md flex items-center justify-between">
+                   <div>
+                      <h2 className="text-xl font-black flex items-center gap-2 relative z-10">
+                          <Trophy className="text-yellow-200" /> Palpites Extras
+                      </h2>
+                      <p className="text-yellow-50 text-xs mt-1 relative z-10 max-w-[90%]">
+                          Valem muitos pontos! Escolha o pódio final e os artilheiros da competição.
+                      </p>
+                   </div>
+                   <Crown size={80} className="absolute -right-4 -bottom-4 text-yellow-700/20" />
+               </div>
+
                {/* 1. PÓDIO DA COPA */}
                <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-gray-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
                    <div className="absolute top-0 right-0 p-4 opacity-5">

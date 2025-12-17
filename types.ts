@@ -14,7 +14,8 @@ export interface Match {
   officialScoreA?: number;
   officialScoreB?: number;
   // Novo campo: Dicionário de apostas { "username": { scoreA: 1, scoreB: 2 } }
-  bets?: Record<string, { scoreA: number, scoreB: number }>;
+  // CORREÇÃO: Permitir number | undefined explicitamente
+  bets?: Record<string, { scoreA: number | undefined, scoreB: number | undefined }>;
 }
 
 export interface ExtraBet {
@@ -42,7 +43,7 @@ export interface Player {
   position: number;
   trend: 'up' | 'down' | 'same';
   history: PlayerHistory[];
-  avatar?: string; // Adicionado para exibir no ranking
+  avatar?: string;
 }
 
 export interface User {
@@ -78,7 +79,6 @@ export interface PrizeConfig {
 }
 
 export interface AppConfig {
-  // bettingLockHours removido conforme solicitação
   scoringRules: ScoringRule[];
   ticketPrice: number;
   prizeDistribution: PrizeConfig;
